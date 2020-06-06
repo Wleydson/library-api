@@ -1,5 +1,6 @@
 package br.com.wleydson.libraryapi.api.controller;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,8 +23,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.wleydson.libraryapi.api.dto.BookDTO;
-import br.com.wleydson.libraryapi.service.BookService;
 import br.com.wleydson.libraryapi.model.entity.Book;
+import br.com.wleydson.libraryapi.service.BookService;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -50,13 +51,12 @@ public class BookControllerTest {
 		String json = new ObjectMapper().writeValueAsString(dto);
 		
 		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-																	.post(BOOK_API)
-																	.contentType(MediaType.APPLICATION_JSON)
-																	.accept(MediaType.APPLICATION_JSON)
-																	.content(json);
+																.post(BOOK_API)
+																.contentType(MediaType.APPLICATION_JSON)
+																.accept(MediaType.APPLICATION_JSON)
+																.content(json);
 		
-		mvc
-			.perform(request)
+		mvc.perform(request)
 			.andExpect( status().isCreated() )
 			.andExpect( jsonPath("id").value(0L) )
 			.andExpect( jsonPath("title").value(dto.getTitle()) )
@@ -66,7 +66,19 @@ public class BookControllerTest {
 	
 	@Test
 	@DisplayName("You should throw an error when creating a book")
-	public void createdInvaledBookTest(){
+	public void createdInvaledBookTest() throws Exception{
+		
+		String json = new ObjectMapper().writeValueAsString(new BookDTO());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+																.post(BOOK_API)
+																.contentType(MediaType.APPLICATION_JSON)
+																.accept(MediaType.APPLICATION_JSON)
+																.content(json);
+		
+		mvc.perform(request)
+			.andExpect( status().isBadRequest() )
+			.andExpect( jsonPath("errors", hasSize(3) ));
 		
 	}
 }
