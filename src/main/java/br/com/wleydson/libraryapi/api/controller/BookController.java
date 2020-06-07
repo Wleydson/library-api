@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.wleydson.libraryapi.api.dto.BookDTO;
 import br.com.wleydson.libraryapi.api.exception.ApiErrors;
+import br.com.wleydson.libraryapi.exception.BusinessException;
 import br.com.wleydson.libraryapi.model.entity.Book;
 import br.com.wleydson.libraryapi.service.BookService;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,13 @@ public class BookController {
 	public ApiErrors handleValidationException(MethodArgumentNotValidException exp) {
 		BindingResult bindingResult = exp.getBindingResult();
 		return new ApiErrors(bindingResult);
+	}
+	
+	@ExceptionHandler(BusinessException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ApiErrors handleBusinessException(BusinessException exp) {
+		String messageError = exp.getMessage();
+		return new ApiErrors(messageError);
 	}
 	
 }
