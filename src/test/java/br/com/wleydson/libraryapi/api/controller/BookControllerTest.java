@@ -4,6 +4,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -103,9 +105,114 @@ public class BookControllerTest {
 			.andExpect( jsonPath("errors[0]").value(error) );
 	}
 	
+	@Test
+	@DisplayName("get information from a book")
+	public void getBookDetailsTest() throws Exception {
+		Long id = 1L;
+		Book book = createNewBook();
+		book.setId(id);
+		
+		BDDMockito.given(service.getById(id)).willReturn(Optional.of(book));
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+																	.get(BOOK_API.concat("/"+id))
+																	.accept(MediaType.APPLICATION_JSON);
+		
+		mvc.perform(request)
+			.andExpect( status().isOk() )
+			.andExpect( jsonPath("id").value(id) )
+			.andExpect( jsonPath("title").value(createNewBook().getTitle()) )
+			.andExpect( jsonPath("author").value(createNewBook().getAuthor()) )
+			.andExpect( jsonPath("isbn").value(createNewBook().getIsbn()) );
+		
+	}
+	
+	@Test
+	@DisplayName("must launch not found when book does not exist")
+	public void bookNotFoundTest() throws Exception {
+		
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+																	.get(BOOK_API.concat("/"+1))
+																	.accept(MediaType.APPLICATION_JSON);
+		mvc.perform(request)
+			.andExpect( status().isNotFound());
+		
+	}
+	
+	@Test
+	@DisplayName("you must delete a book")
+	public void deleteBookTest() throws Exception {
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn( Optional.of(Book.builder().id(1L).build()) );
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+																	.delete(BOOK_API.concat("/"+1));
+		
+		mvc.perform(request).andExpect( status().isNoContent());	
+	}
+	
+	@Test
+	@DisplayName("must launch not found when not finding a book to delete")
+	public void deleteBookNotFoundTest() throws Exception {
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+																	.delete(BOOK_API.concat("/"+1));
+		
+		mvc.perform(request).andExpect( status().isNotFound());	
+	}
+	
+	@Test
+	@DisplayName("must update a book")
+	public void updateBookTest() throws Exception {
+		Long id = 1L;
+		String json = new ObjectMapper().writeValueAsString( createNewBookDTO() );
+		
+		Book updatingBook = Book.builder().id(1L).title("Update").author("You").isbn("000").build();
+		
+		BDDMockito.given(service.getById(id)).willReturn( Optional.of(updatingBook) );
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+																.put( BOOK_API.concat("/"+id) )
+																.contentType(MediaType.APPLICATION_JSON)
+																.accept(MediaType.APPLICATION_JSON)
+																.content(json);
+		
+		Book updatedBook = Book.builder().id(1L).title("My book").author("Wleydson").isbn("000").build();
+		BDDMockito.given(service.update(updatingBook)).willReturn(updatedBook);
+
+		
+		mvc.perform(request)
+					.andExpect( status().isOk() )
+					.andExpect( jsonPath("id").value(id) )
+					.andExpect( jsonPath("title").value(updatingBook.getTitle()) )
+					.andExpect( jsonPath("author").value(updatingBook.getAuthor()) )
+					.andExpect( jsonPath("isbn").value("000"));	
+	}
+	
+	
+	@Test
+	@DisplayName("should launch 404 when updating book that does not exist")
+	public void updateBookNotFoundTest() throws Exception {
+		String json = new ObjectMapper().writeValueAsString( createNewBookDTO() );		
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn( Optional.empty() );
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+																.put( BOOK_API.concat("/"+1) )
+																.contentType(MediaType.APPLICATION_JSON)
+																.accept(MediaType.APPLICATION_JSON)
+																.content(json);
+		
+		mvc.perform(request).andExpect( status().isNotFound() );
+	}
 	
 	
 	private BookDTO createNewBookDTO() {
 		return BookDTO.builder().title("My book").author("Wleydson").isbn("123123").build();
+	}
+	
+	private Book createNewBook() {
+		return Book.builder().title("My book").author("Wleydson").isbn("123123").build();
 	}
 }
