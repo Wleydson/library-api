@@ -25,21 +25,24 @@ public class BookServiceImpl implements BookService{
 	}
 
 	@Override
-	public Optional<Book> getById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Optional<Book> getById(Long id) {		
+		return repository.findById(id);
 	}
 
 	@Override
 	public void delete(Book book) {
-		// TODO Auto-generated method stub
+		if(book == null || book.getId() == null )
+			throw new IllegalArgumentException("Book id cant be null.");
 		
+		repository.delete(book);
 	}
 
 	@Override
 	public Book update(Book book) {
-		// TODO Auto-generated method stub
-		return null;
+		if(book == null || book.getId() == null )
+			throw new IllegalArgumentException("Book id cant be null.");
+		
+		return repository.save(book);
 	}
 
 }

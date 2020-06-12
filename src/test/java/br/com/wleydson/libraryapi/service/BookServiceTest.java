@@ -2,6 +2,8 @@ package br.com.wleydson.libraryapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -62,6 +64,83 @@ public class BookServiceTest {
 		Mockito.verify(repository, Mockito.never()).save(book);
 	}
 	
+	@Test
+	@DisplayName("fetch a book by id")
+	public void bookFindByIdTest() {
+		Long id = 1L;
+		Book book = createNewBook();
+		book.setId(id);
+		
+		Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+		
+		Optional<Book> foundBook = repository.findById(id);
+		
+		
+		assertThat(foundBook.isPresent()).isTrue();
+		assertThat( foundBook.get().getId() ).isEqualTo(id);
+		assertThat( foundBook.get().getAuthor() ).isEqualTo( book.getAuthor() );
+		assertThat( foundBook.get().getTitle() ).isEqualTo( book.getTitle() );
+		assertThat( foundBook.get().getIsbn() ).isEqualTo( book.getIsbn() );
+	}
+	
+	@Test
+	@DisplayName("error when not finding a book")
+	public void bookNotFoundIdTest() {
+		Long id = 1L;		
+		Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+		
+		Optional<Book> foundBook = repository.findById(id);
+		
+		assertThat(foundBook.isPresent()).isFalse();
+	}
+	
+	@Test
+	@DisplayName("delete book")
+	public void deleteBookTest() {
+		Book book = Book.builder().id(1L).build();
+		
+		org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> service.delete(book));
+		
+		Mockito.verify(repository, Mockito.times(1)).delete(book);
+	}	
+	
+	@Test
+	@DisplayName("delete invalid book")
+	public void deleteInvalidBookTest() {
+		Book invalidBook = new Book();
+		
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.delete(invalidBook) );
+		
+		Mockito.verify(repository, Mockito.never() ).delete(invalidBook);
+	}	
+	
+	@Test
+	@DisplayName("update invalid book")
+	public void updateInvalidBookTest() {
+		Book invalidBook = new Book();
+		
+		org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.update(invalidBook) );
+		
+		Mockito.verify(repository, Mockito.never() ).save(invalidBook);
+	}	
+	
+	@Test
+	@DisplayName("update book")
+	public void updateBookTest() {
+		long id = 1L;
+		Book updatingBook = Book.builder().id(id).build();
+		
+		Book updatedBook = createNewBook();
+		updatedBook.setId(id);
+		Mockito.when(repository.save(updatingBook)).thenReturn(updatedBook);
+		
+		Book book = service.update(updatingBook);
+		
+		assertThat( book.getId() ).isEqualTo( updatedBook.getId() );
+		assertThat( book.getAuthor() ).isEqualTo( updatedBook.getAuthor() );
+		assertThat( book.getTitle() ).isEqualTo( updatedBook.getTitle() );
+		assertThat( book.getIsbn() ).isEqualTo( updatedBook.getIsbn() );
+	}	
 	
 	private Book createNewBook() {
 		return Book.builder().title("My book").author("Wleydson").isbn("123123").build();
