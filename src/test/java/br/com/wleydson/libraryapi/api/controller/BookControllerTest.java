@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -207,6 +211,30 @@ public class BookControllerTest {
 		mvc.perform(request).andExpect( status().isNotFound() );
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	@DisplayName("search with filter")
+	public void findBookTest() throws Exception {
+		Book book = createNewBook(1L);
+		
+		BDDMockito.given( service.find(Mockito.any(Book.class), Mockito.any(Pageable.class)) )
+				.willReturn( new PageImpl( Arrays.asList(book), PageRequest.of(0,100), 1) );
+		
+		String queryString = String.format("?title=%s&author=%s&page=0&size=100",book.getTitle(), book.getAuthor());
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API.concat(queryString))
+                .accept(MediaType.APPLICATION_JSON);
+		
+		 mvc
+         .perform( request )
+         .andExpect( status().isOk() )
+         .andExpect( jsonPath("content", hasSize(1)))
+         .andExpect( jsonPath("totalElements").value(1) )
+         .andExpect( jsonPath("pageable.pageSize").value(100) )
+         .andExpect( jsonPath("pageable.pageNumber").value(0));
+		
+	}
+	
 	
 	private BookDTO createNewBookDTO() {
 		return BookDTO.builder().title("My book").author("Wleydson").isbn("123123").build();
@@ -214,5 +242,9 @@ public class BookControllerTest {
 	
 	private Book createNewBook() {
 		return Book.builder().title("My book").author("Wleydson").isbn("123123").build();
+	}
+	
+	private Book createNewBook(final Long id) {
+		return Book.builder().title("My book").author("Wleydson").isbn("123123").id(id).build();
 	}
 }

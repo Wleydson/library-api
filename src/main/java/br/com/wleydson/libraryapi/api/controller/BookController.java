@@ -3,6 +3,8 @@ package br.com.wleydson.libraryapi.api.controller;
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -48,6 +50,12 @@ public class BookController {
 		return service.getById(id)
 				.map( book -> modelMapper.map(book, BookDTO.class) )
 				.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
+	}
+	
+	@GetMapping
+	public Page<BookDTO> find( BookDTO dto, Pageable pageRequest) {
+		Book filter = modelMapper.map(dto, Book.class);
+		return service.find(filter, pageRequest).map(entity -> modelMapper.map(entity, BookDTO.class));
 	}
 	
 	@DeleteMapping("{id}")
