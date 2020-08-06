@@ -43,8 +43,7 @@ public class BookServiceTest {
 	@DisplayName("Must save book")
 	public void saveBookTest() {
 		Book book = createNewBook();
-		Book bookSaved = createNewBook();
-		bookSaved.setId(0L);
+		Book bookSaved = createNewBook(0L);
 
 		Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(false);
 		Mockito.when(repository.save(book)).thenReturn(bookSaved);
@@ -74,8 +73,7 @@ public class BookServiceTest {
 	@DisplayName("fetch a book by id")
 	public void bookFindByIdTest() {
 		Long id = 1L;
-		Book book = createNewBook();
-		book.setId(id);
+		Book book = createNewBook(id);
 		
 		Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
 		
@@ -136,8 +134,7 @@ public class BookServiceTest {
 		long id = 1L;
 		Book updatingBook = Book.builder().id(id).build();
 		
-		Book updatedBook = createNewBook();
-		updatedBook.setId(id);
+		Book updatedBook = createNewBook(id);
 		Mockito.when(repository.save(updatingBook)).thenReturn(updatedBook);
 		
 		Book book = service.update(updatingBook);
@@ -173,6 +170,10 @@ public class BookServiceTest {
 	
 	private Book createNewBook() {
 		return Book.builder().title("My book").author("Wleydson").isbn("123123").build();
+	}
+	
+	private Book createNewBook(Long id) {
+		return Book.builder().title("My book").author("Wleydson").isbn("123123").id(id).build();
 	}
 	
 }

@@ -113,8 +113,7 @@ public class BookControllerTest {
 	@DisplayName("get information from a book")
 	public void getBookDetailsTest() throws Exception {
 		Long id = 1L;
-		Book book = createNewBook();
-		book.setId(id);
+		Book book = createNewBook(id);
 		
 		BDDMockito.given(service.getById(id)).willReturn(Optional.of(book));
 		
