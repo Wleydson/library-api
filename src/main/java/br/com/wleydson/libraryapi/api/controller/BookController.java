@@ -6,10 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.com.wleydson.libraryapi.api.dto.BookDTO;
-import br.com.wleydson.libraryapi.api.exception.ApiErrors;
-import br.com.wleydson.libraryapi.exception.BusinessException;
 import br.com.wleydson.libraryapi.model.entity.Book;
 import br.com.wleydson.libraryapi.service.BookService;
 import lombok.AllArgsConstructor;
@@ -74,21 +69,6 @@ public class BookController {
 			
 			return modelMapper.map(book, BookDTO.class);
 		}).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
-	}
-	
-	
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ApiErrors handleValidationException(MethodArgumentNotValidException exp) {
-		BindingResult bindingResult = exp.getBindingResult();
-		return new ApiErrors(bindingResult);
-	}
-	
-	@ExceptionHandler(BusinessException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ApiErrors handleBusinessException(BusinessException exp) {
-		String messageError = exp.getMessage();
-		return new ApiErrors(messageError);
 	}
 	
 }

@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.validation.BindingResult;
+import org.springframework.web.server.ResponseStatusException;
+
+import br.com.wleydson.libraryapi.exception.BusinessException;
 
 public class ApiErrors {
 
@@ -16,9 +19,13 @@ public class ApiErrors {
 		bindingResult.getAllErrors().forEach(error -> this.errors.add( error.getDefaultMessage() ) );
 	}
 	
-	public ApiErrors(String messageError) {
-		this.errors = Arrays.asList(messageError);
-	}
+	public ApiErrors(ResponseStatusException ex) {
+        this.errors = Arrays.asList(ex.getReason());
+    }
+	
+	public ApiErrors(BusinessException ex) {
+        this.errors = Arrays.asList(ex.getMessage());
+    }
 
 	public List<String> getErrors() {
 		return errors;

@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class LoanDTO {
 
 	private String isbn;
-	private String custumer;
+	private String customer;
 }
