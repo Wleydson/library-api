@@ -57,7 +57,7 @@ public class LoanControllerTest {
 		String json = new ObjectMapper().writeValueAsString(dto);
 		
 		Book book = Book.builder().id(1L).isbn("123").build();
-		BDDMockito.given(bookService.getBookIsbn("123")).willReturn( Optional.of(book) );
+		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.of(book) );
 
 		Loan loan = Loan.builder().id(1L).custumer("Wleydson").book(book).loanDate(LocalDate.now()).build();
 		BDDMockito.given(loanService.save(Mockito.any(Loan.class))).willReturn( loan );
@@ -82,7 +82,7 @@ public class LoanControllerTest {
 		String json = new ObjectMapper().writeValueAsString(dto);
 		
 		Book book = Book.builder().id(1L).isbn("123").build();
-		BDDMockito.given(bookService.getBookIsbn("123")).willReturn( Optional.empty() );
+		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.empty() );
 
 		Loan loan = Loan.builder().id(1L).custumer("Wleydson").book(book).loanDate(LocalDate.now()).build();
 		BDDMockito.given(loanService.save(Mockito.any(Loan.class))).willReturn( loan );
@@ -109,7 +109,7 @@ public class LoanControllerTest {
 		String json = new ObjectMapper().writeValueAsString(dto);
 		
 		Book book = Book.builder().id(1L).isbn("123").build();
-		BDDMockito.given(bookService.getBookIsbn("123")).willReturn( Optional.of(book) );
+		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.of(book) );
 		
 		BDDMockito.given( loanService.save(Mockito.any(Loan.class)) ).willThrow(new BusinessException("Book already loaned"));
 		
