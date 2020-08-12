@@ -2,8 +2,11 @@ package br.com.wleydson.libraryapi.service.impl;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.com.wleydson.libraryapi.api.dto.LoanFilterDTO;
 import br.com.wleydson.libraryapi.exception.BusinessException;
 import br.com.wleydson.libraryapi.model.entity.Loan;
 import br.com.wleydson.libraryapi.model.repository.LoanRepository;
@@ -34,6 +37,11 @@ public class LoanServiceImpl implements LoanService{
 	@Override
 	public Optional<Loan> getByid(Long id) {
         return repository.findById(id);
+	}
+
+	@Override
+	public Page<Loan> find(LoanFilterDTO loanFilterDTO, Pageable pageable ) {
+		return repository.findByBookIsbnOrCustomer(loanFilterDTO.getIsbn(), loanFilterDTO.getCustomer(), pageable);
 	}
 
 }
