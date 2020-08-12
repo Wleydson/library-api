@@ -59,7 +59,7 @@ public class LoanControllerTest {
 		Book book = Book.builder().id(1L).isbn("123").build();
 		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.of(book) );
 
-		Loan loan = Loan.builder().id(1L).custumer("Wleydson").book(book).loanDate(LocalDate.now()).build();
+		Loan loan = Loan.builder().id(1L).customer("Wleydson").book(book).loanDate(LocalDate.now()).build();
 		BDDMockito.given(loanService.save(Mockito.any(Loan.class))).willReturn( loan );
 		
 		
@@ -84,7 +84,7 @@ public class LoanControllerTest {
 		Book book = Book.builder().id(1L).isbn("123").build();
 		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.empty() );
 
-		Loan loan = Loan.builder().id(1L).custumer("Wleydson").book(book).loanDate(LocalDate.now()).build();
+		Loan loan = Loan.builder().id(1L).customer("Wleydson").book(book).loanDate(LocalDate.now()).build();
 		BDDMockito.given(loanService.save(Mockito.any(Loan.class))).willReturn( loan );
 		
 		

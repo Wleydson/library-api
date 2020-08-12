@@ -35,7 +35,7 @@ public class LoanController {
 		
 		Loan entity = Loan.builder()
 				.book(book)
-				.custumer(dto.getCustomer())
+				.customer(dto.getCustomer())
 				.loanDate(LocalDate.now())
 				.build();
 		
