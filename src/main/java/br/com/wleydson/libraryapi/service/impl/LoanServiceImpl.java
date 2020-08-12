@@ -1,5 +1,7 @@
 package br.com.wleydson.libraryapi.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import br.com.wleydson.libraryapi.exception.BusinessException;
@@ -22,6 +24,18 @@ public class LoanServiceImpl implements LoanService{
             throw new BusinessException("Book already loaned");
         }
         return repository.save(loan);
+	}
+
+	@Override
+	public Loan update(Loan loan) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Optional<Loan> getByid(Long id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -4,6 +4,8 @@ package br.com.wleydson.libraryapi.api.controller;
 import java.time.LocalDate;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.com.wleydson.libraryapi.api.dto.LoanDTO;
+import br.com.wleydson.libraryapi.api.dto.ReturnedLoanDTO;
 import br.com.wleydson.libraryapi.model.entity.Book;
 import br.com.wleydson.libraryapi.model.entity.Loan;
 import br.com.wleydson.libraryapi.service.BookService;
@@ -42,6 +45,14 @@ public class LoanController {
 		entity = loanService.save(entity);
 		
 		return entity.getId();
+	}
+	
+	@PatchMapping("{id}")
+	public void returnBook(@PathVariable Long id, @RequestBody ReturnedLoanDTO returnedDTO)  {
+		Loan loan = loanService.getByid(id).get();
+		loan.setReturned(returnedDTO.getReturned());
+		
+		loanService.update(loan);
 	}
 	
 }
