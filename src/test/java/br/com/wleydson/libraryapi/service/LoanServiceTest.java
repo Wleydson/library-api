@@ -7,11 +7,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -101,6 +103,43 @@ public class LoanServiceTest {
                         .customer(customer)
                         .loanDate(LocalDate.now())
                         .build();
+    }
+    
+    @Test
+    @DisplayName("find by id")
+    public void getLoanDetaisTest(){
+        Long id = 1l;
+
+        Loan loan = createLoan();
+        loan.setId(id);
+
+        Mockito.when( repository.findById(id) ).thenReturn(Optional.of(loan));
+
+        Optional<Loan> result = service.getByid(id);
+
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get().getId()).isEqualTo(id);
+        assertThat(result.get().getCustomer()).isEqualTo(loan.getCustomer());
+        assertThat(result.get().getBook()).isEqualTo(loan.getBook());
+        assertThat(result.get().getLoanDate()).isEqualTo(loan.getLoanDate());
+
+        verify( repository ).findById(id);
+
+    }
+
+    @Test
+    @DisplayName("update loan")
+    public void updateLoanTest(){
+        Loan loan = createLoan();
+        loan.setId(1l);
+        loan.setReturned(true);
+
+        when( repository.save(loan) ).thenReturn( loan );
+
+        Loan updatedLoan = service.update(loan);
+
+        assertThat(updatedLoan.getReturned()).isTrue();
+        verify(repository).save(loan);
     }
 	
 }
