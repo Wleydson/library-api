@@ -82,7 +82,7 @@ public class BookRepositoryTest {
 		assertThat(deletedBook).isNull();
 	}
 	
-	private Book createNewBook() {
+	public static Book createNewBook() {
 		return Book.builder().title("My book").author("Wleydson").isbn("123123").build();
 	}
 }
