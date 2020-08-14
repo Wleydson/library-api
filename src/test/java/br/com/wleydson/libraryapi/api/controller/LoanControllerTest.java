@@ -61,8 +61,7 @@ public class LoanControllerTest {
 	@Test
 	@DisplayName("must make a loan")
 	public void createLoanTest() throws Exception{	
-		LoanDTO dto = LoanDTO.builder().isbn("123").customer("Wleydson").build();
-		String json = new ObjectMapper().writeValueAsString(dto);
+		String json = new ObjectMapper().writeValueAsString(createNewLoanDTO());
 		
 		Book book = Book.builder().id(1L).isbn("123").build();
 		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.of(book) );
@@ -86,8 +85,7 @@ public class LoanControllerTest {
 	@Test
 	@DisplayName("error when searching for book")
 	public void invalidCreateLoanTest() throws Exception{	
-		LoanDTO dto = LoanDTO.builder().isbn("123").customer("Wleydson").build();
-		String json = new ObjectMapper().writeValueAsString(dto);
+		String json = new ObjectMapper().writeValueAsString(createNewLoanDTO());
 		
 		Book book = Book.builder().id(1L).isbn("123").build();
 		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.empty() );
@@ -113,8 +111,7 @@ public class LoanControllerTest {
 	@DisplayName("error in borrowing a book already borrowed")
 	public void LoanedBookErrorOnCreateLoanTest() throws Exception{	
 		
-		LoanDTO dto = LoanDTO.builder().isbn("123").customer("Wleydson").build();
-		String json = new ObjectMapper().writeValueAsString(dto);
+		String json = new ObjectMapper().writeValueAsString(createNewLoanDTO());
 		
 		Book book = Book.builder().id(1L).isbn("123").build();
 		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn( Optional.of(book) );
@@ -201,5 +198,9 @@ public class LoanControllerTest {
                 .andExpect( jsonPath("pageable.pageNumber").value(0))
         ;
     }
+	
+	private LoanDTO createNewLoanDTO() {
+		return LoanDTO.builder().isbn("123").customer("Wleydson").email("email@email.com").build();
+	}
 
 }
