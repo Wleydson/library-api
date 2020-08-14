@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.wleydson.libraryapi.api.dto.LoanFilterDTO;
 import br.com.wleydson.libraryapi.exception.BusinessException;
+import br.com.wleydson.libraryapi.model.entity.Book;
 import br.com.wleydson.libraryapi.model.entity.Loan;
 import br.com.wleydson.libraryapi.model.repository.LoanRepository;
 import br.com.wleydson.libraryapi.service.LoanService;
@@ -42,6 +43,11 @@ public class LoanServiceImpl implements LoanService{
 	@Override
 	public Page<Loan> find(LoanFilterDTO loanFilterDTO, Pageable pageable ) {
 		return repository.findByBookIsbnOrCustomer(loanFilterDTO.getIsbn(), loanFilterDTO.getCustomer(), pageable);
+	}
+
+	@Override
+	public Page<Loan> getLoansByBook(Book book, Pageable pageable) {
+		return repository.findByBook(book, pageable);
 	}
 
 }
