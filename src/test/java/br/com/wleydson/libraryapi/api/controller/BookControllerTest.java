@@ -32,6 +32,7 @@ import br.com.wleydson.libraryapi.api.dto.BookDTO;
 import br.com.wleydson.libraryapi.exception.BusinessException;
 import br.com.wleydson.libraryapi.model.entity.Book;
 import br.com.wleydson.libraryapi.service.BookService;
+import br.com.wleydson.libraryapi.service.LoanService;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -46,6 +47,9 @@ public class BookControllerTest {
 	
 	@MockBean
 	BookService service;
+
+	@MockBean
+	LoanService lonaService;
 	
 	@Test
 	@DisplayName("Must create a book successfully")
