@@ -28,10 +28,13 @@ import br.com.wleydson.libraryapi.model.entity.Book;
 import br.com.wleydson.libraryapi.model.entity.Loan;
 import br.com.wleydson.libraryapi.service.BookService;
 import br.com.wleydson.libraryapi.service.LoanService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/loans")
+@Api("Loan Api")
 @RequiredArgsConstructor
 public class LoanController {
 
@@ -41,6 +44,7 @@ public class LoanController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation("Create a loan")
 	public Long create( @RequestBody LoanDTO dto) {
 		Book book = bookService
 				.getBookByIsbn(dto.getIsbn())
@@ -58,6 +62,7 @@ public class LoanController {
 	}
 	
 	@PatchMapping("{id}")
+	@ApiOperation("Returned a loan")
 	public void returnBook(@PathVariable Long id, @RequestBody ReturnedLoanDTO returnedDTO)  {
 		Loan loan = loanService.getByid(id)
 				.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
@@ -67,6 +72,7 @@ public class LoanController {
 	}
 	
 	@GetMapping
+	@ApiOperation("Find loan")
     public Page<LoanDTO> find(LoanFilterDTO dto, Pageable pageRequest) {
         Page<Loan> result = loanService.find(dto, pageRequest);
         List<LoanDTO> loans = result

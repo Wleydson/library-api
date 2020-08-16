@@ -27,10 +27,13 @@ import br.com.wleydson.libraryapi.model.entity.Book;
 import br.com.wleydson.libraryapi.model.entity.Loan;
 import br.com.wleydson.libraryapi.service.BookService;
 import br.com.wleydson.libraryapi.service.LoanService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/books/")
+@Api("Book Api")
 @AllArgsConstructor
 public class BookController {
 
@@ -40,6 +43,7 @@ public class BookController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation("Create a book")
 	public BookDTO create( @RequestBody @Valid BookDTO dto) {
 		Book entity = modelMapper.map(dto, Book.class);
 		entity = service.save(entity);
@@ -48,6 +52,7 @@ public class BookController {
 	}
 	
 	@GetMapping("{id}")
+	@ApiOperation("Get a book by id")
 	public BookDTO get( @PathVariable Long id) {
 		return service.getById(id)
 				.map( book -> modelMapper.map(book, BookDTO.class) )
@@ -55,6 +60,7 @@ public class BookController {
 	}
 	
 	@GetMapping
+	@ApiOperation("Find book a params")
 	public Page<BookDTO> find( BookDTO dto, Pageable pageRequest) {
 		Book filter = modelMapper.map(dto, Book.class);
 		return service.find(filter, pageRequest).map(entity -> modelMapper.map(entity, BookDTO.class));
@@ -62,12 +68,14 @@ public class BookController {
 	
 	@DeleteMapping("{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ApiOperation("Delete a book")
 	public void delete( @PathVariable Long id) {
 		Book book = service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
 		service.delete(book);
 	}
 	
 	@PutMapping("{id}")
+	@ApiOperation("Update a book")
 	public BookDTO update( @PathVariable Long id, @RequestBody @Valid BookDTO dto) {
 		return service.getById(id).map(book ->{
 			book.setTitle(dto.getTitle());
@@ -79,6 +87,7 @@ public class BookController {
 	}
 	
 	@GetMapping("{id}/loans")
+	@ApiOperation("Get a book by id and loans")
     public Page<LoanDTO> loansByBook( @PathVariable Long id, Pageable pageable ){
         Book book = service.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));       
 		Page<Loan> result = loanService.getLoansByBook(book, pageable);
