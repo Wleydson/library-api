@@ -35,16 +35,14 @@ public class BookServiceImpl implements BookService{
 
 	@Override
 	public void delete(Book book) {
-		if(book == null || book.getId() == null )
-			throw new IllegalArgumentException("Book id cant be null.");
+		validBook(book);
 		
 		repository.delete(book);
 	}
 
 	@Override
 	public Book update(Book book) {
-		if(book == null || book.getId() == null )
-			throw new IllegalArgumentException("Book id cant be null.");
+		validBook(book);
 		
 		return repository.save(book);
 	}
@@ -66,4 +64,8 @@ public class BookServiceImpl implements BookService{
 		return repository.findByIsbn(isbn);
 	}
 
+	private void validBook(Book book) {
+		if(book == null || book.getId() == null ) throw new IllegalArgumentException("Book id cant be null.");
+		
+	}
 }

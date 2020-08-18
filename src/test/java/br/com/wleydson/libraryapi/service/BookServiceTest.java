@@ -186,6 +186,35 @@ public class BookServiceTest {
         verify(repository, times(1)).findByIsbn(isbn);
     }
  	
+ 	@Test
+	@DisplayName("Get by id")
+	public void getByIdTest() {
+		Long id = 1L;
+		Book book = createNewBook(id);
+		
+		Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+		
+		Optional<Book> foundBook = service.getById(id);
+		
+		
+		assertThat(foundBook.isPresent()).isTrue();
+		assertThat( foundBook.get().getId() ).isEqualTo(id);
+		assertThat( foundBook.get().getAuthor() ).isEqualTo( book.getAuthor() );
+		assertThat( foundBook.get().getTitle() ).isEqualTo( book.getTitle() );
+		assertThat( foundBook.get().getIsbn() ).isEqualTo( book.getIsbn() );
+	}
+	
+	@Test
+	@DisplayName("Error get by id")
+	public void errorGetByIdTest() {
+		Long id = 1L;		
+		Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+		
+		Optional<Book> foundBook = service.getById(id);
+		
+		assertThat(foundBook.isPresent()).isFalse();
+	}
+ 	
 	private Book createNewBook() {
 		return Book.builder().title("My book").author("Wleydson").isbn("123123").build();
 	}

@@ -126,6 +126,7 @@
 					<excludes>
 						<exclude>br/com/wleydson/libraryapi/api/dto/**/*</exclude>
 						<exclude>br/com/wleydson/libraryapi/model/entity/**/*</exclude>
+						<exclude>br/com/wleydson/libraryapi/*</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
