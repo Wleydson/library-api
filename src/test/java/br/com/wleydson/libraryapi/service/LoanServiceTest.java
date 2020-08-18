@@ -184,6 +184,21 @@ public class LoanServiceTest {
         assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
         assertThat(result.getPageable().getPageSize()).isEqualTo(10);
     }
+    
+    @Test
+    @DisplayName("Find by loan date less than and not returned")
+    public void tes(){
+		LocalDate threeDaysAgo = LocalDate.now().minusDays(4);
+		List<Loan> loans = Arrays.asList(createLoanById(1L));
+		
+        Mockito
+        	.when( repository.findByLoanDateLessThanAndNotReturned(threeDaysAgo) )
+        	.thenReturn(loans);
+
+        List<Loan> result = service.getAllLateLoans();
+
+        assertThat(result.size()).isEqualTo(1);
+    }
 	
     public static Loan createLoan(){
         Book book = Book.builder().id(1l).build();
