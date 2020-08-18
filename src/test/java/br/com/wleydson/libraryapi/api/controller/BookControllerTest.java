@@ -1,11 +1,13 @@
 package br.com.wleydson.libraryapi.api.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,12 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -31,8 +33,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.wleydson.libraryapi.api.dto.BookDTO;
 import br.com.wleydson.libraryapi.exception.BusinessException;
 import br.com.wleydson.libraryapi.model.entity.Book;
+import br.com.wleydson.libraryapi.model.entity.Loan;
 import br.com.wleydson.libraryapi.service.BookService;
 import br.com.wleydson.libraryapi.service.LoanService;
+import br.com.wleydson.libraryapi.service.LoanServiceTest;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -49,7 +53,7 @@ public class BookControllerTest {
 	BookService service;
 
 	@MockBean
-	LoanService lonaService;
+	LoanService loanService;
 	
 	@Test
 	@DisplayName("Must create a book successfully")
@@ -235,6 +239,49 @@ public class BookControllerTest {
          .andExpect( jsonPath("totalElements").value(1) )
          .andExpect( jsonPath("pageable.pageSize").value(100) )
          .andExpect( jsonPath("pageable.pageNumber").value(0));
+		
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	@DisplayName("Fetch book with loans together")
+	public void testLoansByBook() throws Exception {
+		Book book = createNewBook(1L);
+		Loan loan = LoanServiceTest.createLoan();
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn( Optional.of(book));
+		
+		BDDMockito
+			.given( loanService.getLoansByBook(Mockito.any(Book.class), Mockito.any(Pageable.class)) )
+			.willReturn( new PageImpl( Arrays.asList(loan), PageRequest.of(0,20), 1) );
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get( BOOK_API.concat("/"+book.getId()).concat("/loans") )
+                .accept(MediaType.APPLICATION_JSON);
+		
+		 mvc
+         .perform( request )
+         .andExpect( status().isOk() )
+         .andExpect( jsonPath("content", hasSize(1)))
+         .andExpect( jsonPath("totalElements").value(1) )
+         .andExpect( jsonPath("pageable.pageSize").value(20) )
+         .andExpect( jsonPath("pageable.pageNumber").value(0));
+		
+	}
+	
+	@Test
+	@DisplayName("not exists book")
+	public void notBookExists() throws Exception {
+		Book book = createNewBook(1L);
+
+		BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get( BOOK_API.concat("/"+book.getId()).concat("/loans") )
+                .accept(MediaType.APPLICATION_JSON);
+		
+		verify(loanService, never()).getAllLateLoans();
+		mvc.perform(request)
+			.andExpect( status().isNotFound());
 		
 	}
 	
