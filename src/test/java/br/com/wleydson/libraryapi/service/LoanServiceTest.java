@@ -163,6 +163,27 @@ public class LoanServiceTest {
         assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
         assertThat(result.getPageable().getPageSize()).isEqualTo(10);
     }
+    
+    @Test
+    @DisplayName("Get loans by book")
+    public void getLoansByBookTest(){
+        Long id = 1l;
+        
+        List<Loan> lista = Arrays.asList(createLoanById(id));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<Loan> page = new PageImpl<Loan>(lista,  pageRequest, lista.size());
+
+        Mockito
+        	.when( repository.findByBook(Mockito.any(Book.class), Mockito.any(PageRequest.class)) )
+        	.thenReturn(page);
+
+        Page<Loan> result = service.getLoansByBook(Book.builder().id(id).build(), pageRequest);
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent()).isEqualTo(lista);
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+    }
 	
     public static Loan createLoan(){
         Book book = Book.builder().id(1l).build();
@@ -171,6 +192,18 @@ public class LoanServiceTest {
         return Loan.builder()
                         .book(book)
                         .customer(customer)
+                        .loanDate(LocalDate.now())
+                        .build();
+    }
+    
+    public Loan createLoanById(Long id){
+        Book book = Book.builder().id(1l).build();
+        String customer = "Wleydson";
+
+        return Loan.builder()
+                        .book(book)
+                        .customer(customer)
+                        .id(id)
                         .loanDate(LocalDate.now())
                         .build();
     }
